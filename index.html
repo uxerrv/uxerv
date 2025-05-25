@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>welcome to streamtopia - Mono</title>
+<style>
+  /* Reset */
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+  }
+  html, body {
+    height: 100%;
+    background: #000;
+    color: white;
+    font-family: monospace, monospace;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* Particle background canvas */
+  #particles {
+    position: fixed;
+    top:0; left:0; width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Center container */
+  #centerContainer {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 300px;
+  }
+
+  /* Glitch effect keyframes - white & red */
+  @keyframes glitch {
+    0% {
+      text-shadow: 2px 0 red, -2px 0 white;
+      transform: translate(0);
+    }
+    20% {
+      text-shadow: -2px 0 red, 2px 0 white;
+      transform: translate(-2px, 2px);
+    }
+    40% {
+      text-shadow: 2px 0 red, -2px 0 white;
+      transform: translate(2px, -2px);
+    }
+    60% {
+      text-shadow: -2px 0 red, 2px 0 white;
+      transform: translate(-2px, 2px);
+    }
+    80% {
+      text-shadow: 2px 0 red, -2px 0 white;
+      transform: translate(2px, -2px);
+    }
+    100% {
+      text-shadow: 2px 0 red, -2px 0 white;
+      transform: translate(0);
+    }
+  }
+
+  /* Logo */
+  #logo {
+    font-size: 4rem;
+    font-weight: 900;
+    color: white;
+    animation: glitch 1s infinite;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  /* Typewriter effect for welcome - white */
+  #welcome {
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: white;
+    white-space: nowrap;
+    border-right: 3px solid white;
+    overflow: hidden;
+    width: 0;
+    animation: typing 3s steps(20) forwards, blinkCaret 0.75s step-end infinite;
+    user-select: none;
+  }
+  @keyframes typing {
+    to { width: 14ch; }
+  }
+  @keyframes blinkCaret {
+    50% { border-color: transparent; }
+  }
+
+  /* Password input */
+  #passwordInput {
+    font-family: monospace;
+    font-size: 1.2rem;
+    padding: 8px 12px;
+    border: 2px solid white;
+    background: black;
+    color: white;
+    outline: none;
+    border-radius: 6px;
+    letter-spacing: 2px;
+    text-align: center;
+    width: 100%;
+    user-select: text;
+    transition: border-color 0.3s ease;
+  }
+  #passwordInput::placeholder {
+    color: #aaa;
+  }
+  #passwordInput.shake {
+    animation: shake 0.4s ease;
+    border-color: red;
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+
+  /* Social links container */
+  #socialLinks {
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 1s ease, transform 1s ease;
+    user-select: none;
+  }
+  #socialLinks.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .social-link {
+    color: white;
+    text-decoration: none;
+    font-size: 1.4rem;
+    position: relative;
+    font-weight: 600;
+    padding-bottom: 4px;
+  }
+  .social-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 2px;
+    background: white;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+  }
+  .social-link:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  .social-link:hover {
+    animation: glitch 0.7s infinite;
+  }
+
+  /* Custom cursor */
+  #cursor {
+    position: fixed;
+    top: 0; left: 0;
+    width: 24px;
+    height: 36px;
+    background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 36" xmlns="http://www.w3.org/2000/svg"><polygon points="0,0 24,12 14,14 18,36 10,32 10,20 0,24" fill="white"/></svg>') no-repeat center;
+    background-size: contain;
+    pointer-events: none;
+    z-index: 10000;
+    mix-blend-mode: difference;
+    filter: drop-shadow(0 0 3px white);
+    transition: transform 0.2s ease;
+  }
+  a:hover ~ #cursor,
+  #logo:hover ~ #cursor,
+  #passwordInput:hover ~ #cursor {
+    transform: scale(1.3);
+    filter: drop-shadow(0 0 8px white);
+  }
+
+  /* Volume control */
+  #volumeControl {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    font-size: 0.9rem;
+    user-select: none;
+    z-index: 9999;
+  }
+  #volumeSlider {
+    -webkit-appearance: none;
+    width: 120px;
+    height: 6px;
+    background: white;
+    border-radius: 3px;
+    cursor: pointer;
+    outline: none;
+    opacity: 0.8;
+    transition: opacity 0.3s;
+  }
+  #volumeSlider:hover {
+    opacity: 1;
+  }
+  #volumeSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: black;
+    cursor: pointer;
+    border: 2px solid white;
+    margin-top: -4px;
+  }
+  #volumeSlider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: black;
+    cursor: pointer;
+    border: 2px solid white;
+  }
+
+  /* Play/Pause Button */
+  #playPauseBtn {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    cursor: pointer;
+    padding: 5px 10px;
+    font-size: 1rem;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+  }
+  #playPauseBtn:hover {
+    background-color: white;
+    color: black;
+  }
+
+  /* Dark Mode Toggle */
+  #darkToggle {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    cursor: pointer;
+    padding: 6px 12px;
+    font-size: 1rem;
+    border-radius: 8px;
+    user-select: none;
+    z-index: 9999;
+    transition: background-color 0.3s ease;
+  }
+  #darkToggle:hover {
+    background-color: white;
+    color: black;
+  }
+
+  /* Dark mode styles */
+  body.dark {
+    background: #111;
+    color: white;
+  }
+  body.dark #passwordInput {
+    background: #222;
+    border-color: white;
+    color: white;
+  }
+  body.dark #volumeSlider {
+    background: white;
+  }
+  body.dark #volumeSlider::-webkit-slider-thumb {
+    background: white;
+    border-color: #444;
+  }
+  body.dark #volumeSlider::-moz-range-thumb {
+    background: white;
+    border-color: #444;
+  }
+  body.dark #playPauseBtn, body.dark #darkToggle {
+    border-color: white;
+    color: white;
+  }
+  body.dark #playPauseBtn:hover, body.dark #darkToggle:hover {
+    background-color: white;
+    color: black;
+  }
+
+  /* Intro glitch loader */
+  #loader {
+    position: fixed;
+    top:0; left:0;
+    width: 100vw; height: 100vh;
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-family: monospace;
+    font-size: 3rem;
+    animation: glitch 1s infinite;
+    z-index: 100000;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<div id="loader">⛧uxerv⛧</div>
+
+<div id="centerContainer" style="display:none;">
+  <div id="logo" title="Click to login/logout">⛧uxerv⛧</div>
+  <div id="welcome"></div>
+  <input
+    type="password"
+    id="passwordInput"
+    placeholder="Enter password"
+    autocomplete="off"
+    spellcheck="false"
+  />
+  
+  <div class="socials" id="socialLinks">
+    <a class="social-link" href="https://discord.com/users/1373094787305177108" target="_blank">Discord</a>
+    <a class="social-link" href="https://steamcommunity.com/id/uxerv/" target="_blank">Steam</a>
+    <a class="social-link" href="https://www.twitch.tv/uxerv" target="_blank">Twitch</a>
+    <a class="social-link" href="https://www.youtube.com/@uxerr" target="_blank">YouTube</a>
+    <a class="social-link" href="https://www.tiktok.com/@uxerr_" target="_blank">TikTok</a>
+  </div>
+</div>
+
+<div id="volumeControl" style="display:none;">
+  <button id="playPauseBtn" aria-label="Play/Pause Music">▶️</button>
+  <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.2" aria-label="Volume Control"/>
+</div>
+
+<button id="darkToggle" aria-label="Toggle Dark Mode">Dark Mode</button>
+
+<div id="cursor"></div>
+
+<audio id="backgroundMusic" loop>
+  <source src="https://cdn.discordapp.com/attachments/1206815854956912640/1376278287034093648/Nebu_Kiniza_-_Gassed_Up_Prod._By_Mexiko_Dro_nebukinizaoshs.mp3?ex=6834be89&is=68336d09&hm=88a2e6f2765c99975cdc7360a9f9f48ca14eb545e8cbce69b7a86358e044e7cd&" />
+</audio>
+
+<script>
+  const loader = document.getElementById('loader');
+  const centerContainer = document.getElementById('centerContainer');
+  setTimeout(() => {
+    loader.style.transition = 'opacity 1s ease';
+    loader.style.opacity = 0;
+    setTimeout(() => {
+      loader.style.display = 'none';
+      centerContainer.style.display = 'flex';
+    }, 1000);
+  }, 3500);
+
+  const passwordInput = document.getElementById('passwordInput');
+  const welcome = document.getElementById('welcome');
+  const socialLinks = document.getElementById('socialLinks');
+  const volumeControl = document.getElementById('volumeControl');
+  const playPauseBtn = document.getElementById('playPauseBtn');
+  const volumeSlider = document.getElementById('volumeSlider');
+  const backgroundMusic = document.getElementById('backgroundMusic');
+  const logo = document.getElementById('logo');
+  const darkToggle = document.getElementById('darkToggle');
+
+  const PASSWORD = "uxerv";
+  let isLoggedIn = false;
+
+  // Login function
+  function login() {
+    if (passwordInput.value === PASSWORD) {
+      isLoggedIn = true;
+      socialLinks.classList.add("show");
+      volumeControl.style.display = "flex";
+      welcome.textContent = "";
+      passwordInput.style.display = "none";
+      passwordInput.value = "";
+
+      // Play music on successful login
+      backgroundMusic.play();
+      playPauseBtn.textContent = "⏸️";
+
+    } else {
+      passwordInput.classList.add("shake");
+      welcome.textContent = "";
+      setTimeout(() => {
+        passwordInput.classList.remove("shake");
+        welcome.textContent = "";
+      }, 800);
+    }
+  }
+
+  // Toggle music play/pause
+  playPauseBtn.addEventListener("click", () => {
+    if (backgroundMusic.paused) {
+      backgroundMusic.play();
+      playPauseBtn.textContent = "⏸️";
+    } else {
+      backgroundMusic.pause();
+      playPauseBtn.textContent = "▶️";
+    }
+  });
+
+  // Volume slider control
+  volumeSlider.addEventListener("input", (e) => {
+    backgroundMusic.volume = e.target.value;
+  });
+  // Set default volume
+  backgroundMusic.volume = volumeSlider.value;
+
+  // Press Enter to submit password
+  passwordInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      login();
+    }
+  });
+
+  // Logo click toggles logout/login UI reset
+  logo.addEventListener("click", () => {
+    if (isLoggedIn) {
+      // logout
+      isLoggedIn = false;
+      socialLinks.classList.remove("show");
+      volumeControl.style.display = "none";
+      backgroundMusic.pause();
+      playPauseBtn.textContent = "▶️";
+      welcome.textContent = "";
+      passwordInput.style.display = "block";
+      passwordInput.focus();
+    } else {
+      passwordInput.focus();
+    }
+  });
+
+  // Dark mode toggle
+  darkToggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+    darkToggle.textContent = document.body.classList.contains("dark") ? "Light Mode" : "Dark Mode";
+  });
+
+  // Custom cursor follow
+  const cursor = document.getElementById("cursor");
+  document.addEventListener("mousemove", (e) => {
+    cursor.style.left = (e.clientX - 12) + "px";
+    cursor.style.top = (e.clientY - 18) + "px";
+  });
+
+  // Particle background
+  const canvas = document.getElementById("particles");
+  const ctx = canvas.getContext("2d");
+  let particlesArray;
+
+  function initParticles() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    particlesArray = [];
+    const numberOfParticles = Math.floor(canvas.width / 12);
+    for (let i = 0; i < numberOfParticles; i++) {
+      particlesArray.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 1.5 + 0.3,
+        speedX: (Math.random() - 0.5) * 0.5,
+        speedY: (Math.random() - 0.5) * 0.5,
+        alpha: Math.random() * 0.8 + 0.2,
+      });
+    }
+  }
+
+  function drawParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particlesArray.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
+      ctx.fill();
+
+      p.x += p.speedX;
+      p.y += p.speedY;
+
+      if (p.x < 0 || p.x > canvas.width) p.speedX = -p.speedX;
+      if (p.y < 0 || p.y > canvas.height) p.speedY = -p.speedY;
+    });
+    requestAnimationFrame(drawParticles);
+  }
+
+  window.addEventListener("resize", () => {
+    initParticles();
+  });
+
+  initParticles();
+  drawParticles();
+
+</script>
+
+</body>
+</html>
