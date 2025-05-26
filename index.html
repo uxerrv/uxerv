@@ -1,513 +1,529 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>welcome to streamtopia - Mono</title>
-<style>
-  /* Reset */
-  * {
-    margin: 0; padding: 0; box-sizing: border-box;
-  }
-  html, body {
-    height: 100%;
-    background: #000;
-    color: white;
-    font-family: monospace, monospace;
-    overflow: hidden;
-    user-select: none;
-  }
-
-  /* Particle background canvas */
-  #particles {
-    position: fixed;
-    top:0; left:0; width: 100%; height: 100%;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Center container */
-  #centerContainer {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    width: 300px;
-  }
-
-  /* Glitch effect keyframes - white & red */
-  @keyframes glitch {
-    0% {
-      text-shadow: 2px 0 red, -2px 0 white;
-      transform: translate(0);
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title></title>
+  <style>
+    body {
+      margin: 0;
+      color: white;
+      font-family: monospace;
+      overflow: hidden;
+      cursor: none;
+      position: relative;
+      background: black;
     }
-    20% {
-      text-shadow: -2px 0 red, 2px 0 white;
-      transform: translate(-2px, 2px);
+
+    #starfield {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      background: black;
     }
-    40% {
-      text-shadow: 2px 0 red, -2px 0 white;
-      transform: translate(2px, -2px);
+
+    #cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 24px;
+      height: 36px;
+      background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 36" xmlns="http://www.w3.org/2000/svg"><polygon points="0,0 24,12 14,14 18,36 10,32 10,20 0,24" fill="white"/></svg>') no-repeat center;
+      background-size: contain;
+      z-index: 10000;
+      pointer-events: none;
+      mix-blend-mode: difference;
+      filter: drop-shadow(0 0 3px white);
+      animation: glitchCursor 0.3s infinite alternate;
     }
-    60% {
-      text-shadow: -2px 0 red, 2px 0 white;
-      transform: translate(-2px, 2px);
+
+    @keyframes glitchCursor {
+      0% { transform: translate(0, 0) scale(1); filter: drop-shadow(1px 0 white); }
+      33% { transform: translate(1px, -1px) scale(1.01); filter: drop-shadow(-1px 0 white); }
+      66% { transform: translate(-1px, 1px) scale(0.99); filter: drop-shadow(0 -1px white); }
+      100% { transform: translate(0, 0) scale(1); filter: drop-shadow(0 1px white); }
     }
-    80% {
-      text-shadow: 2px 0 red, -2px 0 white;
-      transform: translate(2px, -2px);
+
+    .center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 10;
+      transition: all 0.8s ease;
+      cursor: pointer;
+      user-select: none;
     }
-    100% {
-      text-shadow: 2px 0 red, -2px 0 white;
-      transform: translate(0);
+
+    .top-center {
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.5rem;
+      letter-spacing: 1px;
+      animation: none;
     }
-  }
 
-  /* Logo */
-  #logo {
-    font-size: 4rem;
-    font-weight: 900;
-    color: white;
-    animation: glitch 1s infinite;
-    cursor: pointer;
-    user-select: none;
-  }
+    #logo {
+      font-size: 2rem;
+      letter-spacing: 2px;
+      cursor: pointer;
+      animation: flicker 1.5s infinite alternate;
+    }
 
-  /* Typewriter effect for welcome - white */
-  #welcome {
-    font-size: 1.3rem;
-    font-weight: 500;
-    color: white;
-    white-space: nowrap;
-    border-right: 3px solid white;
-    overflow: hidden;
-    width: 0;
-    animation: typing 3s steps(20) forwards, blinkCaret 0.75s step-end infinite;
-    user-select: none;
-  }
-  @keyframes typing {
-    to { width: 14ch; }
-  }
-  @keyframes blinkCaret {
-    50% { border-color: transparent; }
-  }
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; text-shadow: 0 0 5px white; }
+    }
 
-  /* Password input */
-  #passwordInput {
-    font-family: monospace;
-    font-size: 1.2rem;
-    padding: 8px 12px;
-    border: 2px solid white;
-    background: black;
-    color: white;
-    outline: none;
-    border-radius: 6px;
-    letter-spacing: 2px;
-    text-align: center;
-    width: 100%;
-    user-select: text;
-    transition: border-color 0.3s ease;
-  }
-  #passwordInput::placeholder {
-    color: #aaa;
-  }
-  #passwordInput.shake {
-    animation: shake 0.4s ease;
-    border-color: red;
-  }
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    20%, 60% { transform: translateX(-8px); }
-    40%, 80% { transform: translateX(8px); }
-  }
+    #overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      opacity: 0;
+      transition: opacity 1s ease;
+      z-index: 1;
+      pointer-events: none;
+    }
 
-  /* Social links container */
-  #socialLinks {
-    margin-top: 40px;
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 1s ease, transform 1s ease;
-    user-select: none;
-  }
-  #socialLinks.show {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .social-link {
-    color: white;
-    text-decoration: none;
-    font-size: 1.4rem;
-    position: relative;
-    font-weight: 600;
-    padding-bottom: 4px;
-  }
-  .social-link::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0;
-    width: 100%; height: 2px;
-    background: white;
-    transform: scaleX(0);
-    transform-origin: right;
-    transition: transform 0.3s ease;
-  }
-  .social-link:hover::after {
-    transform: scaleX(1);
-    transform-origin: left;
-  }
-  .social-link:hover {
-    animation: glitch 0.7s infinite;
-  }
+    .overlay-visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
 
-  /* Custom cursor */
-  #cursor {
-    position: fixed;
-    top: 0; left: 0;
-    width: 24px;
-    height: 36px;
-    background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 36" xmlns="http://www.w3.org/2000/svg"><polygon points="0,0 24,12 14,14 18,36 10,32 10,20 0,24" fill="white"/></svg>') no-repeat center;
-    background-size: contain;
-    pointer-events: none;
-    z-index: 10000;
-    mix-blend-mode: difference;
-    filter: drop-shadow(0 0 3px white);
-    transition: transform 0.2s ease;
-  }
-  a:hover ~ #cursor,
-  #logo:hover ~ #cursor,
-  #passwordInput:hover ~ #cursor {
-    transform: scale(1.3);
-    filter: drop-shadow(0 0 8px white);
-  }
+    .socials-container {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transform: translateY(-50px);
+      transition: opacity 1.2s ease, transform 1.2s ease;
+      z-index: 5;
+      pointer-events: none;
+    }
 
-  /* Volume control */
-  #volumeControl {
-    position: fixed;
-    top: 12px;
-    right: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: white;
-    font-size: 0.9rem;
-    user-select: none;
-    z-index: 9999;
-  }
-  #volumeSlider {
-    -webkit-appearance: none;
-    width: 120px;
-    height: 6px;
-    background: white;
-    border-radius: 3px;
-    cursor: pointer;
-    outline: none;
-    opacity: 0.8;
-    transition: opacity 0.3s;
-  }
-  #volumeSlider:hover {
-    opacity: 1;
-  }
-  #volumeSlider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: black;
-    cursor: pointer;
-    border: 2px solid white;
-    margin-top: -4px;
-  }
-  #volumeSlider::-moz-range-thumb {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: black;
-    cursor: pointer;
-    border: 2px solid white;
-  }
+    .socials-container.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
 
-  /* Play/Pause Button */
-  #playPauseBtn {
-    background: transparent;
-    border: 2px solid white;
-    color: white;
-    cursor: pointer;
-    padding: 5px 10px;
-    font-size: 1rem;
-    border-radius: 6px;
-    transition: background-color 0.3s ease;
-  }
-  #playPauseBtn:hover {
-    background-color: white;
-    color: black;
-  }
+    #profilePic {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid white;
+      object-fit: cover;
+      margin-bottom: 70px;
+      box-shadow: 0 0 10px white;
+    }
 
-  /* Dark Mode Toggle */
-  #darkToggle {
-    position: fixed;
-    bottom: 15px;
-    right: 15px;
-    background: transparent;
-    border: 2px solid white;
-    color: white;
-    cursor: pointer;
-    padding: 6px 12px;
-    font-size: 1rem;
-    border-radius: 8px;
-    user-select: none;
-    z-index: 9999;
-    transition: background-color 0.3s ease;
-  }
-  #darkToggle:hover {
-    background-color: white;
-    color: black;
-  }
+    .socials {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      align-items: center;
+    }
 
-  /* Dark mode styles */
-  body.dark {
-    background: #111;
-    color: white;
-  }
-  body.dark #passwordInput {
-    background: #222;
-    border-color: white;
-    color: white;
-  }
-  body.dark #volumeSlider {
-    background: white;
-  }
-  body.dark #volumeSlider::-webkit-slider-thumb {
-    background: white;
-    border-color: #444;
-  }
-  body.dark #volumeSlider::-moz-range-thumb {
-    background: white;
-    border-color: #444;
-  }
-  body.dark #playPauseBtn, body.dark #darkToggle {
-    border-color: white;
-    color: white;
-  }
-  body.dark #playPauseBtn:hover, body.dark #darkToggle:hover {
-    background-color: white;
-    color: black;
-  }
+    .social-link {
+      text-decoration: none;
+      color: white;
+      font-size: 1.5rem;
+      position: relative;
+    }
 
-  /* Intro glitch loader */
-  #loader {
-    position: fixed;
-    top:0; left:0;
-    width: 100vw; height: 100vh;
-    background: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-family: monospace;
-    font-size: 3rem;
-    animation: glitch 1s infinite;
-    z-index: 100000;
-  }
-</style>
+    .social-link::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      bottom: -4px;
+      left: 0;
+      background: white;
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+      transform-origin: right;
+    }
+
+    .social-link:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+
+    /* Volume slider container */
+    #volumeControl {
+      position: fixed;
+      top: 10px;
+      right: 15px;
+      z-index: 10001;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      user-select: none;
+    }
+
+    #volumeControl label {
+      color: white;
+    }
+
+    #volumeSlider {
+      -webkit-appearance: none;
+      width: 100px;
+      height: 6px;
+      background: white;
+      border-radius: 3px;
+      cursor: pointer;
+      outline: none;
+      opacity: 0.8;
+      transition: opacity 0.3s;
+    }
+
+    #volumeSlider:hover {
+      opacity: 1;
+    }
+
+    #volumeSlider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: black;
+      cursor: pointer;
+      border: 2px solid white;
+      margin-top: -4px;
+    }
+
+    #volumeSlider::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: black;
+      cursor: pointer;
+      border: 2px solid white;
+    }
+
+    /* Play/Pause Button Style */
+    #musicToggleBtn {
+      background: none;
+      border: 1px solid white;
+      color: white;
+      padding: 2px 8px;
+      font-family: monospace;
+      cursor: pointer;
+    }
+
+    #musicToggleBtn:hover {
+      background: white;
+      color: black;
+    }
+
+    /* Password prompt styles */
+    #passwordPrompt {
+      position: fixed;
+      inset: 0;
+      background: black;
+      z-index: 100000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-family: monospace;
+    }
+
+    #passwordPrompt input[type="password"] {
+      background: transparent;
+      border: 2px solid white;
+      border-radius: 4px;
+      color: white;
+      font-size: 1.2rem;
+      padding: 10px 15px;
+      width: 250px;
+      margin-top: 15px;
+      outline: none;
+      text-align: center;
+      transition: transform 0.1s ease;
+    }
+
+    /* Shake animation */
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
+
+    #passwordPrompt.shake input[type="password"] {
+      animation: shake 0.3s ease;
+      border-color: #ff4444;
+    }
+
+    #passwordPrompt button {
+      margin-top: 15px;
+      background: none;
+      border: 2px solid white;
+      border-radius: 4px;
+      color: white;
+      font-family: monospace;
+      font-size: 1.1rem;
+      padding: 8px 20px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #passwordPrompt button:hover {
+      background-color: white;
+      color: black;
+    }
+
+    #passwordError {
+      color: #ff4444;
+      margin-top: 12px;
+      font-size: 1rem;
+      height: 1.2rem;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    #passwordError.visible {
+      opacity: 1;
+    }
+  </style>
 </head>
 <body>
+  <canvas id="starfield"></canvas>
 
-<canvas id="particles"></canvas>
+  <div id="cursor"></div>
 
-<div id="loader">⛧uxerv⛧</div>
+  <div class="center" id="logo">⛧ uxerv ⛧</div>
 
-<div id="centerContainer" style="display:none;">
-  <div id="logo" title="Click to login/logout">⛧uxerv⛧</div>
-  <div id="welcome"></div>
-  <input
-    type="password"
-    id="passwordInput"
-    placeholder="Enter password"
-    autocomplete="off"
-    spellcheck="false"
-  />
-  
-  <div class="socials" id="socialLinks">
-    <a class="social-link" href="https://discord.com/users/1373094787305177108" target="_blank">Discord</a>
-    <a class="social-link" href="https://steamcommunity.com/id/uxerv/" target="_blank">Steam</a>
-    <a class="social-link" href="https://www.twitch.tv/uxerv" target="_blank">Twitch</a>
-    <a class="social-link" href="https://www.youtube.com/@uxerr" target="_blank">YouTube</a>
-    <a class="social-link" href="https://www.tiktok.com/@uxerr_" target="_blank">TikTok</a>
+  <div id="overlay"></div>
+
+  <!-- Container for profile pic and socials -->
+  <div class="socials-container" id="socialContainer">
+    <img
+      id="profilePic"
+      src="https://cdn.discordapp.com/attachments/1206815854956912640/1376450955934957598/2490ad77d7a6216d1078dfbcd3ee94cd.jpg?ex=68355f59&is=68340dd9&hm=662e96b92b15d87b8c94da7bcf025cbfbae4074122d4a66d1dac574600ac9a5e&"
+      alt="Profile Picture"
+      title="Profile Picture"
+    />
+    <div class="socials" id="socialLinks">
+      <a class="social-link" href="https://discord.com/users/1373094787305177108" target="_blank">Discord</a>
+      <a class="social-link" href="https://steamcommunity.com/id/uxerv/" target="_blank">Steam</a>
+      <a class="social-link" href="https://www.twitch.tv/uxerv" target="_blank">Twitch</a>
+      <a class="social-link" href="https://www.youtube.com/@uxerr" target="_blank">YouTube</a>
+      <a class="social-link" href="https://www.tiktok.com/@uxerr_" target="_blank">TikTok</a>
+    </div>
   </div>
-</div>
 
-<div id="volumeControl" style="display:none;">
-  <button id="playPauseBtn" aria-label="Play/Pause Music">▶️</button>
-  <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.2" aria-label="Volume Control"/>
-</div>
+  <!-- Background music audio -->
+  <audio id="backgroundMusic" src="https://cdn.discordapp.com/attachments/1206815854956912640/1376402314470096946/SpotiDownloader.com_-_my_bad_-_yuke.mp3?ex=6835320c&is=6833e08c&hm=98f559e15ecbd10730bf9d0c9d6427dc8d6e843d4d36516f6ed346bd7ca18ad7&" loop></audio>
 
-<button id="darkToggle" aria-label="Toggle Dark Mode">Dark Mode</button>
+  <!-- Volume control slider -->
+  <div id="volumeControl" title="Music Volume" style="display:none;">
+    <label for="volumeSlider">Vol</label>
+    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5" />
+    <button id="musicToggleBtn">Pause</button>
+  </div>
 
-<div id="cursor"></div>
+  <!-- Password prompt -->
+  <div id="passwordPrompt">
+    <div>Enter Password</div>
+    <input type="password" id="passwordInput" autocomplete="off" />
+    <button id="submitPassword">Unlock</button>
+    <div id="passwordError"></div>
+  </div>
 
-<audio id="backgroundMusic" loop>
-  <source src="https://cdn.discordapp.com/attachments/1206815854956912640/1376278287034093648/Nebu_Kiniza_-_Gassed_Up_Prod._By_Mexiko_Dro_nebukinizaoshs.mp3?ex=6834be89&is=68336d09&hm=88a2e6f2765c99975cdc7360a9f9f48ca14eb545e8cbce69b7a86358e044e7cd&" />
-</audio>
+  <script>
+    // Starfield animation
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    let stars = [];
 
-<script>
-  const loader = document.getElementById('loader');
-  const centerContainer = document.getElementById('centerContainer');
-  setTimeout(() => {
-    loader.style.transition = 'opacity 1s ease';
-    loader.style.opacity = 0;
-    setTimeout(() => {
-      loader.style.display = 'none';
-      centerContainer.style.display = 'flex';
-    }, 1000);
-  }, 3500);
+    function init() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
 
-  const passwordInput = document.getElementById('passwordInput');
-  const welcome = document.getElementById('welcome');
-  const socialLinks = document.getElementById('socialLinks');
-  const volumeControl = document.getElementById('volumeControl');
-  const playPauseBtn = document.getElementById('playPauseBtn');
-  const volumeSlider = document.getElementById('volumeSlider');
-  const backgroundMusic = document.getElementById('backgroundMusic');
-  const logo = document.getElementById('logo');
-  const darkToggle = document.getElementById('darkToggle');
-
-  const PASSWORD = "uxerv";
-  let isLoggedIn = false;
-
-  // Login function
-  function login() {
-    if (passwordInput.value === PASSWORD) {
-      isLoggedIn = true;
-      socialLinks.classList.add("show");
-      volumeControl.style.display = "flex";
-      welcome.textContent = "";
-      passwordInput.style.display = "none";
-      passwordInput.value = "";
-
-      // Play music on successful login
-      backgroundMusic.play();
-      playPauseBtn.textContent = "⏸️";
-
-    } else {
-      passwordInput.classList.add("shake");
-      welcome.textContent = "";
-      setTimeout(() => {
-        passwordInput.classList.remove("shake");
-        welcome.textContent = "";
-      }, 800);
+      stars = [];
+      for (let i = 0; i < 150; i++) {
+        stars.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          radius: Math.random() * 1.1 + 0.2,
+          speed: Math.random() * 0.2 + 0.05,
+          direction: Math.random() < 0.5 ? 1 : -1
+        });
+      }
     }
-  }
 
-  // Toggle music play/pause
-  playPauseBtn.addEventListener("click", () => {
-    if (backgroundMusic.paused) {
-      backgroundMusic.play();
-      playPauseBtn.textContent = "⏸️";
-    } else {
-      backgroundMusic.pause();
-      playPauseBtn.textContent = "▶️";
-    }
-  });
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = 'white';
 
-  // Volume slider control
-  volumeSlider.addEventListener("input", (e) => {
-    backgroundMusic.volume = e.target.value;
-  });
-  // Set default volume
-  backgroundMusic.volume = volumeSlider.value;
+      stars.forEach(star => {
+        star.x += star.speed * star.direction;
+        if (star.x < 0) star.x = width;
+        if (star.x > width) star.x = 0;
 
-  // Press Enter to submit password
-  passwordInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      login();
-    }
-  });
-
-  // Logo click toggles logout/login UI reset
-  logo.addEventListener("click", () => {
-    if (isLoggedIn) {
-      // logout
-      isLoggedIn = false;
-      socialLinks.classList.remove("show");
-      volumeControl.style.display = "none";
-      backgroundMusic.pause();
-      playPauseBtn.textContent = "▶️";
-      welcome.textContent = "";
-      passwordInput.style.display = "block";
-      passwordInput.focus();
-    } else {
-      passwordInput.focus();
-    }
-  });
-
-  // Dark mode toggle
-  darkToggle.addEventListener("click", () => {
-    document.body.classList.toggle("dark");
-    darkToggle.textContent = document.body.classList.contains("dark") ? "Light Mode" : "Dark Mode";
-  });
-
-  // Custom cursor follow
-  const cursor = document.getElementById("cursor");
-  document.addEventListener("mousemove", (e) => {
-    cursor.style.left = (e.clientX - 12) + "px";
-    cursor.style.top = (e.clientY - 18) + "px";
-  });
-
-  // Particle background
-  const canvas = document.getElementById("particles");
-  const ctx = canvas.getContext("2d");
-  let particlesArray;
-
-  function initParticles() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    particlesArray = [];
-    const numberOfParticles = Math.floor(canvas.width / 12);
-    for (let i = 0; i < numberOfParticles; i++) {
-      particlesArray.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        radius: Math.random() * 1.5 + 0.3,
-        speedX: (Math.random() - 0.5) * 0.5,
-        speedY: (Math.random() - 0.5) * 0.5,
-        alpha: Math.random() * 0.8 + 0.2,
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, 2 * Math.PI);
+        ctx.fill();
       });
+
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', init);
+    init();
+    animate();
+
+    // Main UI logic
+    const logo = document.getElementById('logo');
+    const overlay = document.getElementById('overlay');
+    const socialContainer = document.getElementById('socialContainer');
+    const socialLinks = document.getElementById('socialLinks');
+    const backgroundMusic = document.getElementById('backgroundMusic');
+    const volumeControl = document.getElementById('volumeControl');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const musicToggleBtn = document.getElementById('musicToggleBtn');
+
+    const passwordPrompt = document.getElementById('passwordPrompt');
+    const passwordInput = document.getElementById('passwordInput');
+    const submitPassword = document.getElementById('submitPassword');
+    const passwordError = document.getElementById('passwordError');
+
+    let isHome = true;
+    const CORRECT_PASSWORD = "uxerv";
+
+    function showSocials() {
+      overlay.classList.add('overlay-visible');
+      socialContainer.classList.add('show');
+      logo.classList.add('top-center');
+      volumeControl.style.display = 'flex';
+    }
+
+    function hideSocials() {
+      overlay.classList.remove('overlay-visible');
+      socialContainer.classList.remove('show');
+      logo.classList.remove('top-center');
+      volumeControl.style.display = 'none';
+    }
+
+    logo.addEventListener('click', () => {
+      if (isHome) {
+        showSocials();
+        backgroundMusic.volume = volumeSlider.value;
+        backgroundMusic.play().catch(e => {
+          console.log('Music play blocked until user interaction.', e);
+        });
+        musicToggleBtn.textContent = 'Pause';
+        isHome = false;
+      } else {
+        hideSocials();
+        backgroundMusic.pause();
+        backgroundMusic.currentTime = 0;
+        isHome = true;
+      }
+    });
+
+    volumeSlider.addEventListener('input', () => {
+      backgroundMusic.volume = volumeSlider.value;
+    });
+
+    musicToggleBtn.addEventListener('click', () => {
+      if (backgroundMusic.paused) {
+        backgroundMusic.play();
+        musicToggleBtn.textContent = 'Pause';
+      } else {
+        backgroundMusic.pause();
+        musicToggleBtn.textContent = 'Play';
+      }
+    });
+
+    // Custom cursor movement
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
+
+    // Password logic
+    function unlock() {
+      const val = passwordInput.value.trim();
+      if (val.toLowerCase() === CORRECT_PASSWORD) {
+        passwordPrompt.style.display = 'none';
+      } else {
+        passwordError.textContent = 'Incorrect password!';
+        passwordError.classList.add('visible');
+        passwordPrompt.classList.add('shake');
+        setTimeout(() => {
+          passwordPrompt.classList.remove('shake');
+          passwordError.classList.remove('visible');
+        }, 1000);
+        passwordInput.value = '';
+      }
+    }
+
+    submitPassword.addEventListener('click', unlock);
+
+    passwordInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        unlock();
+      }
+    });
+
+    passwordInput.focus();
+  const text = "@uxerv";
+  let index = 0;
+  let typing = true;
+
+  function typeWriterTitle() {
+    if (typing) {
+      document.title = text.substring(0, index + 1);
+      index++;
+
+      if (index === 1) {
+        // Pause longer after typing "@"
+        setTimeout(typeWriterTitle, 1500);  // 1.5s pause at "@"
+      } else if (index === text.length) {
+        // Pause when full word typed before deleting
+        typing = false;
+        setTimeout(typeWriterTitle, 1500);
+      } else {
+        setTimeout(typeWriterTitle, 600);  // slower typing speed
+      }
+    } else {
+      // Deleting
+      document.title = text.substring(0, index - 1);
+      index--;
+
+      if (index === 0) {
+        typing = true;
+        setTimeout(typeWriterTitle, 1000);  // pause before typing again
+      } else {
+        setTimeout(typeWriterTitle, 400);  // slower deleting speed
+      }
     }
   }
 
-  function drawParticles() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    particlesArray.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
-      ctx.fill();
-
-      p.x += p.speedX;
-      p.y += p.speedY;
-
-      if (p.x < 0 || p.x > canvas.width) p.speedX = -p.speedX;
-      if (p.y < 0 || p.y > canvas.height) p.speedY = -p.speedY;
-    });
-    requestAnimationFrame(drawParticles);
-  }
-
-  window.addEventListener("resize", () => {
-    initParticles();
-  });
-
-  initParticles();
-  drawParticles();
-
+  window.onload = typeWriterTitle;
 </script>
-
 </body>
 </html>
