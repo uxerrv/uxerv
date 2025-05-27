@@ -403,7 +403,31 @@
       }
     }
     /* END of responsive block */
-  </style>
+  
+.cursor-star {
+  position: fixed;
+  width: 4px;
+  height: 4px;
+  background-color: white;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 1;
+  box-shadow: 0 0 6px white, 0 0 12px white;
+  animation: starFade 0.6s ease-out forwards;
+}
+
+@keyframes starFade {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+</style>
 <style>
 #introScreen {
   position: fixed;
@@ -475,7 +499,6 @@
 <div id="introScreen">
 <div id="introText">booting<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div>
 </div>
-
 <canvas id="starfield"></canvas>
 <div class="center" id="logo">⛧ uxerv ⛧</div>
 <div id="overlay"></div>
@@ -739,7 +762,6 @@
       canvas.height = window.innerHeight;
     });
   </script>
-
 <div id="terminalConsole">
 <div class="terminal-output" id="terminalOutput"></div>
 <input autocomplete="off" id="terminalInput" placeholder="&gt;_" type="text"/>
@@ -793,5 +815,29 @@ input?.addEventListener("keydown", (e) => {
     output.scrollTop = output.scrollHeight;
   }
 });
+</script><script>
+let lastMoveTime = Date.now();
+let isIdle = false;
+
+document.addEventListener('mousemove', (e) => {
+  const now = Date.now();
+  lastMoveTime = now;
+  if (isIdle) isIdle = false;
+
+  if (!isIdle) {
+    const star = document.createElement('div');
+    star.className = 'cursor-star';
+    star.style.left = e.clientX + 'px';
+    star.style.top = e.clientY + 'px';
+    document.body.appendChild(star);
+    setTimeout(() => star.remove(), 600);
+  }
+});
+
+setInterval(() => {
+  if (Date.now() - lastMoveTime > 2000) {
+    isIdle = true;
+  }
+}, 500);
 </script></body>
 </html>
